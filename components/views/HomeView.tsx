@@ -30,7 +30,7 @@ const HomeView = () => {
   const [gameName, setGameName] = useState('');
   const [joinGameId, setJoinGameId] = useState('');
 
-  const handleCreateGame = (e: React.FormEvent) => {
+  const handleCreateGame = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedName = gameName.trim();
     if (!trimmedName) return;
@@ -40,7 +40,7 @@ const HomeView = () => {
     // --- CAMBIO IMPORTANTE: GUARDAMOS EN FIREBASE ---
     // En lugar de localStorage, usamos la función 'set' de Firebase
     const gameRef = ref(db, 'games/' + newGame.id);
-    set(gameRef, newGame);
+    await set(gameRef, newGame);
     // ------------------------------------------------
 
     // Esto te redirige a la nueva partida
