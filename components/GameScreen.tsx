@@ -38,7 +38,7 @@ const Header = ({ gameName, gameId, gameState }: { gameName: string; gameId: str
     </div>
     
     {/* Y aquí mantenemos el nombre del juego */}
-    <p className="mt-2 text-lg text-gray-400 font-semibold">{game.name}</p>
+    <p className="mt-2 text-lg text-gray-400 font-semibold">{gameName}</p>
 </header>
     );
 };
