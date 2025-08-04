@@ -1,6 +1,0 @@
-{
-  "name": "La Porra Musical",
-  "description": "Una aplicación para organizar el juego 'La Porra Musical'. Los usuarios pueden enviar canciones anónimamente a través de enlaces de YouTube, y los participantes votan sobre quién envió cada canción. El anfitrión revela las canciones y las respuestas correctas una por una, con una clasificación final al final.",
-  "requestFramePermissions": [],
-  "prompt": ""
-}
