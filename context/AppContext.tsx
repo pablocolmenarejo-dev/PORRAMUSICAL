@@ -4,7 +4,7 @@ import Button from '../components/shared/Button';
 import Card from '../components/shared/Card';
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue, set } from 'firebase/database';
-import { firebaseConfig } from '../../firebaseConfig';
+import { firebaseConfig } from '../firebaseConfig';
 
 // 1. Inicializamos la conexión con Firebase
 const app = initializeApp(firebaseConfig);
