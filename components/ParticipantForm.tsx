@@ -6,12 +6,20 @@ import Card from './shared/Card';
 
 const ParticipantForm = () => {
   const [name, setName] = useState('');
-  const { addParticipant } = useAppContext();
+  // Pedimos el ID del juego y la función para añadir participantes
+  const { addParticipant, game } = useAppContext();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim()) {
-      addParticipant(name);
+    const trimmedName = name.trim();
+    if (trimmedName) {
+      addParticipant(trimmedName);
+      
+      // --- ¡CAMBIO IMPORTANTE! ---
+      // Guardamos el nombre de este jugador en su navegador, asociado a este juego.
+      localStorage.setItem(`porra-musical-user-${game.id}`, trimmedName);
+      // -----------------------------
+
       setName('');
     }
   };
@@ -24,17 +32,11 @@ const ParticipantForm = () => {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Nombre del participante"
+          placeholder="Tu nombre de participante"
           required
         />
         <Button type="submit" variant="secondary" className="flex-shrink-0">Añadir</Button>
       </form>
-      
-      {/* --- BLOQUE DE CÓDIGO ELIMINADO ---
-          Aquí antes se mostraba la lista de participantes. 
-          Lo hemos quitado para mantener el anonimato. 
-      */}
-
     </Card>
   );
 };
