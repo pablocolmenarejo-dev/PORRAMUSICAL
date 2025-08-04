@@ -20,34 +20,26 @@ const Header = ({ gameName, gameId, gameState }: { gameName: string; gameId: str
     };
 
     return (
-        <header className="py-6 text-center">
-            <div className="flex justify-center items-center gap-4">
-                <TrophyIcon className="w-10 h-10 text-yellow-400" />
-                <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-                    La Porra Musical
-                </h1>
-                <MusicNoteIcon className="w-10 h-10 text-cyan-400" />
-            </div>
-            <p className="mt-2 text-lg text-gray-400 font-semibold">{gameName}</p>
-
-            {gameState === GameState.SUBMISSION && (
-                <Card className="max-w-lg mx-auto mt-6 !p-4 bg-gray-800/80">
-                    <p className="text-sm text-gray-300 mb-2 font-semibold">¡Partida creada! Invita a otros jugadores con este enlace:</p>
-                    <div className="flex items-center gap-2">
-                        <Input 
-                            type="text"
-                            readOnly 
-                            value={window.location.href}
-                            className="text-sm !py-2 text-cyan-300 bg-gray-900"
-                            onFocus={(e) => e.target.select()}
-                        />
-                        <Button onClick={handleCopy} variant="secondary" className="!py-2 flex-shrink-0 w-28">
-                            {copied ? '¡Copiado!' : 'Copiar'}
-                        </Button>
-                    </div>
-                </Card>
-            )}
-        </header>
+        <header className="py-6 text-center relative"> {/* 'relative' es importante para posicionar el botón */}
+    {/* Este es el nuevo botón de la casa */}
+    <a href="/#" className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1V9a1 1 0 011-1h2a1 1 0 011 1v10a1 1 0 001 1m-6 0h6" />
+        </svg>
+    </a>
+    
+    {/* Esto es el título que ya tenías */}
+    <div className="flex justify-center items-center gap-4">
+        <TrophyIcon className="w-10 h-10 text-yellow-400" />
+        <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+            La Porra Musical
+        </h1>
+        <MusicNoteIcon className="w-10 h-10 text-cyan-400" />
+    </div>
+    
+    {/* Y aquí mantenemos el nombre del juego */}
+    <p className="mt-2 text-lg text-gray-400 font-semibold">{game.name}</p>
+</header>
     );
 };
 
