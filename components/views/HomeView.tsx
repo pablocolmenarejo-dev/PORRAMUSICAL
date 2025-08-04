@@ -5,6 +5,16 @@ import Input from '../shared/Input';
 import { Game, GameState } from '../../types';
 import { TrophyIcon } from '../icons/Icons';
 
+// --- NUEVO: AÑADIMOS LAS HERRAMIENTAS DE FIREBASE ---
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, set } from 'firebase/database';
+import { firebaseConfig } from '../../firebaseConfig';
+
+// --- NUEVO: INICIALIZAMOS LA CONEXIÓN ---
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+// ----------------------------------------------------
+
 const createNewGame = (name: string): Game => {
   return {
     id: crypto.randomUUID(),
@@ -26,7 +36,14 @@ const HomeView = () => {
     if (!trimmedName) return;
     
     const newGame = createNewGame(trimmedName);
-    localStorage.setItem(`porra-musical-game-${newGame.id}`, JSON.stringify(newGame));
+
+    // --- CAMBIO IMPORTANTE: GUARDAMOS EN FIREBASE ---
+    // En lugar de localStorage, usamos la función 'set' de Firebase
+    const gameRef = ref(db, 'games/' + newGame.id);
+    set(gameRef, newGame);
+    // ------------------------------------------------
+
+    // Esto te redirige a la nueva partida
     window.location.hash = `/game/${newGame.id}`;
   };
 
@@ -35,7 +52,6 @@ const HomeView = () => {
     let gameId = joinGameId.trim();
     if (!gameId) return;
 
-    // Extract ID from full URL if pasted
     const urlParts = gameId.split('#/game/');
     if (urlParts.length > 1) {
       gameId = urlParts[1];
