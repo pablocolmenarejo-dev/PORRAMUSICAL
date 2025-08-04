@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
 import Input from './shared/Input';
@@ -7,7 +6,7 @@ import Card from './shared/Card';
 
 const ParticipantForm = () => {
   const [name, setName] = useState('');
-  const { addParticipant, participants } = useAppContext();
+  const { addParticipant } = useAppContext();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,14 +29,12 @@ const ParticipantForm = () => {
         />
         <Button type="submit" variant="secondary" className="flex-shrink-0">Añadir</Button>
       </form>
-      {participants.length > 0 && (
-        <div className="mt-4">
-          <h4 className="font-semibold text-gray-300">Participantes registrados:</h4>
-          <ul className="list-disc list-inside mt-2 text-gray-400">
-            {participants.map(p => <li key={p.id}>{p.name}</li>)}
-          </ul>
-        </div>
-      )}
+      
+      {/* --- BLOQUE DE CÓDIGO ELIMINADO ---
+          Aquí antes se mostraba la lista de participantes. 
+          Lo hemos quitado para mantener el anonimato. 
+      */}
+
     </Card>
   );
 };
