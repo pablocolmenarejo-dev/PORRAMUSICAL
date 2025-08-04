@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../../context/AppContext';
 import { GameState, Vote } from '../../types';
 import Button from '../shared/Button';
@@ -7,7 +7,7 @@ import { MusicNoteIcon } from '../icons/Icons';
 
 const getYouTubeThumbnail = (url: string): string | null => {
     if (!url) return null;
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const regExp = /^.*(youtube.com\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
     const videoId = (match && match[2].length === 11) ? match[2] : null;
 
@@ -17,10 +17,25 @@ const getYouTubeThumbnail = (url: string): string | null => {
     return null;
 };
 
-
 const VotingView = () => {
-  const { participants, songs, castVote, setGameState, votes } = useAppContext();
+  const { game, participants, songs, castVote, setGameState, votes } = useAppContext();
   const [currentVoterId, setCurrentVoterId] = useState<string>('');
+  const [localParticipantName, setLocalParticipantName] = useState<string | null>(null);
+
+  // --- ¡CAMBIO IMPORTANTE! ---
+  // Al cargar, leemos la identidad guardada para este juego
+  useEffect(() => {
+    if (game) {
+      const savedUser = localStorage.getItem(`porra-musical-user-${game.id}`);
+      setLocalParticipantName(savedUser);
+      // Si encontramos un usuario, lo seleccionamos por defecto para votar
+      const participant = participants.find(p => p.name === savedUser);
+      if (participant) {
+        setCurrentVoterId(participant.id);
+      }
+    }
+  }, [game, participants]);
+  // -----------------------------
 
   const handleVote = (songId: string, guessedParticipantId: string) => {
     if (!currentVoterId) return;
@@ -32,7 +47,14 @@ const VotingView = () => {
     return votes.find(v => v.voterId === currentVoterId && v.songId === songId)?.guessedParticipantId || '';
   }
   
-  if (!currentVoterId) {
+  // Si el navegador tiene una identidad guardada, solo mostramos a ese participante.
+  // Si no, se muestran todos (para espectadores).
+  const availableVoters = localParticipantName
+    ? participants.filter(p => p.name === localParticipantName)
+    : participants;
+
+  // Si no hemos encontrado a un votante, mostramos el selector
+  if (!currentVoterId && availableVoters.length > 1) {
     return (
       <Card className="max-w-md mx-auto text-center">
         <h2 className="text-2xl font-bold mb-4 text-cyan-300">¿Quién está votando?</h2>
@@ -42,7 +64,7 @@ const VotingView = () => {
           className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500 mb-4"
         >
           <option value="">Selecciona tu nombre para votar...</option>
-          {participants.map(p => (
+          {availableVoters.map(p => (
             <option key={p.id} value={p.id}>{p.name}</option>
           ))}
         </select>
@@ -66,9 +88,8 @@ const VotingView = () => {
       <Card>
         <div className="flex flex-wrap justify-between items-center gap-2">
             <h2 className="text-2xl font-bold text-cyan-300">
-                Turno de <span className="text-white">{participants.find(p => p.id === currentVoterId)?.name}</span>
+                Turno de <span className="text-white">{participants.find(p => p.id === currentVoterId)?.name || 'Votante'}</span>
             </h2>
-            <Button variant="secondary" onClick={() => setCurrentVoterId('')}>Cambiar de votante</Button>
         </div>
         <p className="text-gray-400 mt-1">Asigna cada canción a la persona que crees que la trajo.</p>
         <p className="text-sm text-purple-400 mt-1">Progreso: {votesByCurrentUser}/{songs.length} votos emitidos.</p>
