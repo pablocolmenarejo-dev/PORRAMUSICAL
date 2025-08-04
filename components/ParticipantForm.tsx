@@ -12,7 +12,7 @@ const ParticipantForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedName = name.trim();
-    if (trimmedName) {
+    if (trimmedName && game) {
       addParticipant(trimmedName);
       
       // --- ¡CAMBIO IMPORTANTE! ---
