@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import HomeView from './components/views/HomeView';
+import HomeView from './src/components/views/HomeView';
 import GameScreen from './components/GameScreen';
 
 const App = () => {
