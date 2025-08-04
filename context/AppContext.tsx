@@ -6,7 +6,6 @@ import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue, set } from 'firebase/database';
 import { firebaseConfig } from '../firebaseConfig';
 
-// 1. Inicializamos la conexión con Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
@@ -17,16 +16,22 @@ export const AppProvider = ({ children, gameId }: { children: ReactNode; gameId:
   const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
-  // 2. Este useEffect escucha los cambios en la base de datos EN TIEMPO REAL
   useEffect(() => {
-    // Apuntamos a la "pizarra" específica de nuestro juego usando su ID
     const gameRef = ref(db, 'games/' + gameId);
 
-    // onValue se ejecuta cada vez que los datos de ese juego cambian
     onValue(gameRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        setGame(data);
+        // --- ¡ESTA ES LA CORRECCIÓN IMPORTANTE! ---
+        // Nos aseguramos de que las listas siempre existan, aunque vengan vacías de Firebase.
+        const sanitizedGame = {
+          ...data,
+          participants: data.participants || [],
+          songs: data.songs || [],
+          votes: data.votes || [],
+        };
+        setGame(sanitizedGame);
+        // -----------------------------------------
         setError('');
       } else {
         setGame(null);
@@ -34,9 +39,8 @@ export const AppProvider = ({ children, gameId }: { children: ReactNode; gameId:
       }
       setLoading(false);
     });
-  }, [gameId]); // Se activa solo si cambia el ID del juego
+  }, [gameId]);
 
-  // 3. Esta es la nueva función central. Coge el juego modificado y lo guarda en Firebase
   const updateGameInDb = (updatedGame: Game) => {
     const gameRef = ref(db, 'games/' + updatedGame.id);
     set(gameRef, updatedGame);
@@ -49,7 +53,6 @@ export const AppProvider = ({ children, gameId }: { children: ReactNode; gameId:
     }
   };
 
-  // El resto de funciones ahora usan `updateGame` que guarda todo en la base de datos
   const addParticipant = (name: string) => {
     updateGame(draft => {
       if (name.trim() && !draft.participants.some(p => p.name.toLowerCase() === name.toLowerCase())) {
@@ -116,7 +119,7 @@ export const AppProvider = ({ children, gameId }: { children: ReactNode; gameId:
     );
   }
   
-  if (!game) return null; // No muestra nada si no hay juego (ya se muestra el error)
+  if (!game) return null;
 
   const value: AppContextType = {
     game,
