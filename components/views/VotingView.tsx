@@ -7,19 +7,22 @@ import { MusicNoteIcon } from '../icons/Icons';
 
 const getYouTubeVideoId = (url: string): string | null => {
     if (!url) return null;
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
+    const regExp = /^.*(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/;
+    if(!url.match(regExp)) return null;
+    const videoIdMatch = url.match(/(?<=v=)[^&#]+/);
+    const shortUrlIdMatch = url.match(/(?<=youtu.be\/)[^&#]+/);
+    const videoId = videoIdMatch ? videoIdMatch[0] : (shortUrlIdMatch ? shortUrlIdMatch[0]: null);
+    return videoId && videoId.length === 11 ? videoId : null;
 };
 
 const getYouTubeThumbnail = (url: string): string | null => {
     const videoId = getYouTubeVideoId(url);
-    return videoId ? \`https://img.youtube.com/vi/\${videoId}/sddefault.jpg\` : null;
+    return videoId ? `https://img.youtube.com/vi/${videoId}/sddefault.jpg` : null;
 };
 
 const getYouTubeEmbedUrl = (url: string): string | null => {
     const videoId = getYouTubeVideoId(url);
-    return videoId ? \`https://www.youtube.com/embed/\${videoId}\` : null;
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
 };
 
 const VotingView = () => {
@@ -29,7 +32,7 @@ const VotingView = () => {
 
   useEffect(() => {
     if (game) {
-      const savedUser = localStorage.getItem(\`porra-musical-user-\${game.id}\`);
+      const savedUser = localStorage.getItem(`porra-musical-user-${game.id}`);
       setLocalParticipantName(savedUser);
       const participant = participants.find(p => p.name === savedUser);
       if (participant) {
@@ -80,11 +83,11 @@ const VotingView = () => {
                 {participants.map(participant => (
                     <span
                     key={participant.id}
-                    className={\`px-3 py-1 rounded-full text-sm font-medium transition-all duration-300 ease-in-out \${
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-all duration-300 ease-in-out ${
                         guessedParticipantIds.has(participant.id)
                         ? 'bg-green-500/80 text-white line-through decoration-2 decoration-black/50'
                         : 'bg-gray-700 text-gray-300'
-                    }\`}
+                    }`}
                     >
                     {participant.name}
                     </span>
@@ -115,7 +118,7 @@ const VotingView = () => {
                 ) : thumbnailUrl ? (
                     <img
                         src={thumbnailUrl}
-                        alt={\`Carátula de \${song.title}\`}
+                        alt={`Carátula de ${song.title}`}
                         className="w-full h-48 object-cover"
                         loading="lazy"
                     />
