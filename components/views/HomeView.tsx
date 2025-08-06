@@ -1,3 +1,5 @@
+// pablocolmenarejo-dev/porramusical/PORRAMUSICAL-fa8abcd5a6b39b83eda823564e73e90c00f60fbc/components/views/HomeView.tsx
+
 import React, { useState } from 'react';
 import Card from '../shared/Card';
 import Button from '../shared/Button';
@@ -5,15 +7,12 @@ import Input from '../shared/Input';
 import { Game, GameState } from '../../types';
 import { TrophyIcon } from '../icons/Icons';
 
-// --- NUEVO: AÑADIMOS LAS HERRAMIENTAS DE FIREBASE ---
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, set } from 'firebase/database';
 import { firebaseConfig } from '../../firebaseConfig';
 
-// --- NUEVO: INICIALIZAMOS LA CONEXIÓN ---
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-// ----------------------------------------------------
 
 const createNewGame = (name: string): Game => {
   return {
@@ -23,6 +22,8 @@ const createNewGame = (name: string): Game => {
     participants: [],
     songs: [],
     votes: [],
+    creatorId: crypto.randomUUID(), // Se genera un ID único para el creador
+    revealedSongIds: [], // Inicializa la lista de canciones reveladas
   };
 };
 
@@ -37,13 +38,12 @@ const HomeView = () => {
     
     const newGame = createNewGame(trimmedName);
 
-    // --- CAMBIO IMPORTANTE: GUARDAMOS EN FIREBASE ---
-    // En lugar de localStorage, usamos la función 'set' de Firebase
     const gameRef = ref(db, 'games/' + newGame.id);
     await set(gameRef, newGame);
-    // ------------------------------------------------
 
-    // Esto te redirige a la nueva partida
+    // Guardamos el ID del creador en su navegador para identificarlo como moderador
+    localStorage.setItem(`porra-musical-moderator-${newGame.id}`, newGame.creatorId);
+
     window.location.hash = `/game/${newGame.id}`;
   };
 
