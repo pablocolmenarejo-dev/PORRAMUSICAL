@@ -8,14 +8,15 @@ import { CheckCircleIcon, XCircleIcon, TrophyIcon } from '../icons/Icons';
 // --- FUNCIONES CORREGIDAS ---
 const getYouTubeVideoId = (url: string): string | null => {
     if (!url) return null;
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const regExp = /^.*(http:\/\/googleusercontent.com\/youtube.com\/7\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return (match && match[2] && match[2].length === 11) ? match[2] : null;
 };
 
 const getYouTubeEmbedUrl = (url: string): string | null => {
     const videoId = getYouTubeVideoId(url);
-    return videoId ? `https://www.youtube.com/embed/$${videoId}` : null;
+    // URL de incrustación estándar y correcta de YouTube
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
 };
 // -----------------------------
 
