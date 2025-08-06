@@ -10,8 +10,8 @@ const getYouTubeVideoId = (url: string): string | null => {
     let videoId = null;
     // Expresiones regulares para varios formatos de URL de YouTube
     const regexps = [
-        /(?:\?v=|&v=|\/embed\/|\/v\/|http:\/\/googleusercontent.com\/youtube.com\/7\/)([^&#?]+)/,
-        /(?:http:\/\/googleusercontent.com\/youtube.com\/6\/)[^/]*\?id=([^&]+)/,
+        /(?:\?v=|&v=|\/embed\/|\/v\/|http:\/\/googleusercontent.com\/http:\/\/googleusercontent.com\/youtube.com\/0\/7\/)([^&#?]+)/,
+        /(?:http:\/\/googleusercontent.com\/http:\/\/googleusercontent.com\/youtube.com\/0\/6\/)[^/]*\?id=([^&]+)/,
         /youtu\.be\/([^&#?]+)/
     ];
     for (const re of regexps) {
@@ -35,13 +35,18 @@ const VotingView = () => {
   const [currentVoterId, setCurrentVoterId] = useState<string>('');
   const [localParticipantName, setLocalParticipantName] = useState<string | null>(null);
 
+  // Al cargar, identifica al usuario guardado en el navegador para este juego
   useEffect(() => {
     if (game) {
+      // Busca el nombre de usuario guardado en localStorage
       const savedUser = localStorage.getItem(`porra-musical-user-${game.id}`);
-      setLocalParticipantName(savedUser);
-      const participant = participants.find(p => p.name === savedUser);
-      if (participant) {
-        setCurrentVoterId(participant.id);
+      if (savedUser) {
+        setLocalParticipantName(savedUser);
+        const participant = participants.find(p => p.name === savedUser);
+        if (participant) {
+            // Si encuentra al participante, establece su ID para la votación
+            setCurrentVoterId(participant.id);
+        }
       }
     }
   }, [game, participants]);
@@ -59,7 +64,6 @@ const VotingView = () => {
 
   const guessedParticipantIds = new Set(votes.filter(v => v.voterId === currentVoterId && v.guessedParticipantId).map(v => v.guessedParticipantId));
   
-  // Comprueba si todos los participantes han votado por todas las canciones
   const allVotesIn = participants.length > 0 && songs.length > 0 && participants.every(p => 
     songs.every(s => votes.some(v => v.voterId === p.id && v.songId === s.id))
   );
@@ -67,40 +71,24 @@ const VotingView = () => {
   return (
     <div className="space-y-8">
       <Card>
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
-            <div>
-                <h2 className="text-2xl font-bold text-cyan-300">Turno de {localParticipantName || '...'}</h2>
-                <p className="text-gray-400 mt-1">Asigna cada canción a la persona que crees que la trajo.</p>
-                {currentVoterId && (
-                    <p className="text-sm text-gray-500 mt-1">
-                        Progreso: {votes.filter(v => v.voterId === currentVoterId).length}/{songs.length} votos emitidos.
-                    </p>
-                )}
-            </div>
-            <div className="text-right mt-4 sm:mt-0">
-                <label htmlFor="voter-select" className="block text-sm font-medium text-gray-400 mb-1">Votando como:</label>
-                <select
-                    id="voter-select"
-                    value={currentVoterId}
-                    onChange={(e) => {
-                        const newVoterId = e.target.value;
-                        const participant = participants.find(p => p.id === newVoterId);
-                        setCurrentVoterId(newVoterId);
-                        if(participant) {
-                            setLocalParticipantName(participant.name);
-                            if(game) {
-                                localStorage.setItem(`porra-musical-user-${game.id}`, participant.name);
-                            }
-                        }
-                    }}
-                    className="bg-gray-700 border border-gray-600 rounded-lg px-3 py-1 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                    <option value="">Selecciona tu nombre</option>
-                    {participants.map(p => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
-                    ))}
-                </select>
-            </div>
+        <div>
+            {localParticipantName ? (
+                <>
+                    <h2 className="text-2xl font-bold text-cyan-300">Turno de {localParticipantName}</h2>
+                    <p className="text-gray-400 mt-1">Asigna cada canción a la persona que crees que la trajo.</p>
+                </>
+            ) : (
+                <>
+                    <h2 className="text-2xl font-bold text-cyan-300">Modo Espectador</h2>
+                    <p className="text-yellow-400 mt-1">No te has unido como participante. No puedes votar.</p>
+                </>
+            )}
+
+            {currentVoterId && (
+                <p className="text-sm text-gray-500 mt-1">
+                    Progreso: {votes.filter(v => v.voterId === currentVoterId).length}/{songs.length} votos emitidos.
+                </p>
+            )}
         </div>
         <div className="mt-4 pt-4 border-t border-gray-700/50">
             <h4 className="font-semibold text-gray-300 mb-3">Participantes a asignar:</h4>
@@ -151,6 +139,7 @@ const VotingView = () => {
                         value={getVoteForSong(song.id)}
                         onChange={(e) => handleVote(song.id, e.target.value)}
                         className="w-full px-4 py-2 bg-gray-900 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        // El desplegable se deshabilita si el usuario no es un participante válido
                         disabled={!currentVoterId}
                     >
                         <option value="">¿Quién la trajo?</option>
