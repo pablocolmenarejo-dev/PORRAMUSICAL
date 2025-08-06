@@ -1,3 +1,5 @@
+// pablocolmenarejo-dev/porramusical/PORRAMUSICAL-fa8abcd5a6b39b83eda823564e73e90c00f60fbc/types.ts
+
 export interface Song {
   id: string;
   title: string;
@@ -31,6 +33,8 @@ export interface Game {
   songs: Song[];
   participants: Participant[];
   votes: Vote[];
+  creatorId: string; // ID del creador/moderador
+  revealedSongIds: string[]; // IDs de las canciones reveladas
 }
 
 export interface AppContextType {
@@ -44,4 +48,5 @@ export interface AppContextType {
   castVote: (vote: Vote) => void;
   setGameState: (state: GameState) => void;
   resetGame: () => void;
+  revealSong: (songId: string) => void; // Nueva función
 }
